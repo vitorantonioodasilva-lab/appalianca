@@ -120,7 +120,6 @@ Depois de publicado, troque os links `appIos` e `appAndroid` em
 
 ## Logo
 
-`assets/logo.svg` e `src/components/Logo.tsx` são um redesenho em vetor do símbolo da
-Aliança (três faixas em hexágono). Os ícones e a tela de abertura em `assets/` saem desse
-desenho, em branco sobre `#0E7A84`. Se a associação tiver o arquivo oficial em vetor,
-substitua esses arquivos por ele.
+`assets/logo.svg` e `src/components/Logo.tsx` são o símbolo da Aliança vetorizado a partir da
+logo oficial (seis faixas em volta de um hexágono). Os ícones e a tela de abertura em
+`assets/` saem desse desenho, em branco sobre `#0E7A84`.

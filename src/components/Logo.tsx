@@ -1,30 +1,13 @@
-import Svg, { ClipPath, Defs, Line, Mask, Path, Rect } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
-// Símbolo da Aliança Brasil (três faixas em hexágono). Mesmo desenho de assets/logo.svg.
-const ANEL =
-  'M100,4 183.14,52 183.14,148 100,196 16.86,148 16.86,52Z M49.77,71 49.77,129 100,158 150.23,129 150.23,71 100,42Z';
-const RECORTE = 'M144.64,22.68 189.28,100 144.64,177.32 55.36,177.32 10.72,100 55.36,22.68Z';
-const CORTES = [
-  [150.23, 71, 210.85, 106],
-  [100, 158, 39.38, 193],
-  [49.77, 71, 49.77, 1],
-] as const;
+// Símbolo da Aliança Brasil, vetorizado da logo oficial. Mesmo desenho de assets/logo.svg.
+const SIMBOLO =
+  'M74.1,197.3 30.9,172.2 30.9,91.6 51.7,79.1 52.2,160.1 116.1,197.1ZM126.7,197.0 57.7,157.2 57.4,132.9 126.5,172.7 191.4,135.5 170.6,172.0ZM126.3,166.7 105.8,154.4 174.8,114.3 175.1,38.8 196.5,74.7 196.5,125.8ZM25.4,163.2 4.1,127.8 4.0,76.8 74.2,36.0 94.7,48.2 25.7,88.4ZM148.7,123.1 148.3,42.2 84.5,4.4 126.9,4.5 169.8,30.4 169.5,111.1ZM142.5,69.6 74.0,29.8 8.3,67.0 29.0,30.7 73.6,5.1 143.1,45.7Z';
 
 export function Logo({ tamanho = 40, cor = '#FFFFFF' }: { tamanho?: number; cor?: string }) {
   return (
-    <Svg width={tamanho} height={tamanho} viewBox="0 0 200 200" accessibilityRole="image" accessibilityLabel="Aliança Brasil">
-      <Defs>
-        <ClipPath id="recorte">
-          <Path d={RECORTE} />
-        </ClipPath>
-        <Mask id="faixas" x="0" y="0" width="200" height="200" maskUnits="userSpaceOnUse">
-          <Path d={ANEL} fill="#FFFFFF" fillRule="evenodd" />
-          {CORTES.map(([x1, y1, x2, y2]) => (
-            <Line key={`${x1}-${y1}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#000000" strokeWidth={9} />
-          ))}
-        </Mask>
-      </Defs>
-      <Rect width="200" height="200" fill={cor} mask="url(#faixas)" clipPath="url(#recorte)" />
+    <Svg width={tamanho} height={tamanho} viewBox="-2 -1 204 204" accessibilityRole="image" accessibilityLabel="Aliança Brasil">
+      <Path d={SIMBOLO} fill={cor} />
     </Svg>
   );
 }
