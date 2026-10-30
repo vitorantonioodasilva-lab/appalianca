@@ -81,42 +81,28 @@ src/
   (`src/lib/notificacoes.ts` já envia `PUT /dispositivo`, sem pedir permissão).
 - Vocabulário: proteção, associação, evento, benefício, contrato.
 
-## Publicação
+## Testar e publicar (Android e iPhone)
 
-Perfis do EAS em `eas.json`: `development`, `preview` (APK interno) e `production`.
+O passo a passo completo, do computador zerado até as duas lojas, está em
+[docs/PUBLICAR-E-TESTAR.md](docs/PUBLICAR-E-TESTAR.md).
+
+Perfis do EAS em `eas.json`:
+
+| Perfil | Android | iPhone | Para quê |
+| --- | --- | --- | --- |
+| `preview` | APK | instalação direta (aparelhos cadastrados) | testar |
+| `production` | AAB | IPA para App Store / TestFlight | lojas |
+| `development` | dev build | dev build | programar |
 
 ```bash
-npx eas-cli@latest login
-```
-
-```bash
-npx eas-cli@latest init
+npx eas-cli@latest build --platform all --profile preview
 ```
 
 ```bash
 npx eas-cli@latest build --platform all --profile production
 ```
 
-```bash
-npx eas-cli@latest submit --platform all --profile production
-```
-
-Antes do primeiro envio às lojas:
-
-1. Contas da associação: Apple Developer Program (com CNPJ) e Google Play Console.
-2. Identificador: `br.com.aliancabrasil.associado` (iPhone e Android).
-3. Em `eas.json`, troque `ascAppId` pelo ID do app no App Store Connect e coloque a chave da
-   conta de serviço do Google em `google-play-service-account.json` (fica fora do git).
-4. Política de privacidade publicada com um link aberto (hoje `/privacidade` no sistema pede
-   login) e informada nas duas lojas.
-5. Formulários de dados (Apple "Privacidade do app" e Google "Segurança dos dados"): nome,
-   CPF, telefone, fotos e documentos enviados pelo associado; uso para funcionalidade do app;
-   sem rastreamento e sem compartilhamento com terceiros para publicidade.
-6. Exclusão de conta: botão "Excluir minha conta" no Perfil abre o WhatsApp da Aliança com
-   o pedido pronto.
-
-Depois de publicado, troque os links `appIos` e `appAndroid` em
-`src/server/domain/contacts.ts` do sistema.
+Imagens para as lojas em `assets/loja/`.
 
 ## Logo
 

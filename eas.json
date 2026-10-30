@@ -13,26 +13,35 @@
     },
     "preview": {
       "distribution": "internal",
-      "android": { "buildType": "apk" },
+      "android": {
+        "buildType": "apk",
+        "image": "latest"
+      },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://recupreacaodeleadsalianca.vercel.app/api/app/v1"
+      },
+      "ios": {
+        "image": "latest"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_API_URL": "https://recupreacaodeleadsalianca.vercel.app/api/app/v1"
+      },
+      "android": {
+        "image": "latest"
+      },
+      "ios": {
+        "image": "latest"
       }
     }
   },
   "submit": {
     "production": {
-      "ios": {
-        "ascAppId": "PREENCHER_ID_DO_APP_NO_APP_STORE_CONNECT"
-      },
       "android": {
-        "serviceAccountKeyPath": "./google-play-service-account.json",
-        "track": "internal"
+        "track": "internal",
+        "releaseStatus": "draft"
       }
     }
   }
