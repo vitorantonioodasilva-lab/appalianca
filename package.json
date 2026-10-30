@@ -1,0 +1,76 @@
+{
+  "name": "alianca-associado",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@tanstack/react-query": "^5.105.0",
+    "expo": "~58.0.21",
+    "expo-brightness": "~58.0.2",
+    "expo-clipboard": "~58.0.4",
+    "expo-constants": "~58.0.14",
+    "expo-dev-client": "~58.0.17",
+    "expo-device": "~58.0.5",
+    "expo-document-picker": "~58.0.4",
+    "expo-file-system": "~58.0.13",
+    "expo-font": "~58.0.11",
+    "expo-image": "~58.0.18",
+    "expo-image-manipulator": "~58.0.16",
+    "expo-image-picker": "~58.0.10",
+    "expo-linear-gradient": "~58.0.3",
+    "expo-linking": "~58.0.15",
+    "expo-router": "~58.0.28",
+    "expo-secure-store": "~58.0.2",
+    "expo-sharing": "~58.0.21",
+    "expo-splash-screen": "~58.0.12",
+    "expo-status-bar": "~58.0.4",
+    "expo-system-ui": "~58.0.7",
+    "expo-web-browser": "~58.0.7",
+    "lucide-react-native": "^1.64.0",
+    "openapi-fetch": "^0.17.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "~4.30.0",
+    "react-native-svg": "15.16.0"
+  },
+  "devDependencies": {
+    "@testing-library/react-native": "^14.1.0",
+    "@types/jest": "30.0.0",
+    "@types/react": "~19.3.0",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~58.0.4",
+    "jest": "~30.5.2",
+    "jest-expo": "~58.0.13",
+    "openapi-typescript": "^7.10.1",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "api": "node scripts/api.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "expo lint",
+    "test": "jest",
+    "test:ci": "jest --ci",
+    "doctor": "expo-doctor"
+  },
+  "private": true,
+  "overrides": {
+    "openapi-typescript": {
+      "typescript": "$typescript"
+    }
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFiles": [
+      "<rootDir>/jest.setup.ts"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|standard-navigation|lucide-react-native|openapi-fetch))",
+      "/node_modules/react-native-reanimated/plugin/",
+      "/node_modules/@react-native/babel-preset/"
+    ]
+  }
+}

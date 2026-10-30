@@ -1,0 +1,1458 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Aliança Brasil — API do aplicativo do associado",
+    "version": "1.0.0",
+    "description": "API dos aplicativos (iPhone e Android) do associado: entrar pelo CPF com código de 10 minutos mandado pelo WhatsApp do cadastro, situação do benefício, carteirinha digital, 2ª via, eventos, documentos e contratos. Autenticação: Authorization: Bearer <token da sessão>."
+  },
+  "servers": [
+    {
+      "url": "https://recupreacaodeleadsalianca.vercel.app/api/app/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sessao": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Token aba_... devolvido por POST /entrar/confirmar"
+      }
+    },
+    "schemas": {
+      "Erro": {
+        "type": "object",
+        "properties": {
+          "erro": {
+            "type": "string"
+          },
+          "campos": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "erro"
+        ]
+      },
+      "Veiculo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "placa": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "ABC-1D23"
+          },
+          "veiculo": {
+            "type": "string",
+            "example": "Volkswagen Gol 2020"
+          },
+          "cor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "plano": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "PLANO DRIVER+"
+          },
+          "mensalidade": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "diaVencimento": {
+            "type": "integer"
+          },
+          "situacao": {
+            "type": "string",
+            "enum": [
+              "AGUARDANDO_ATIVACAO",
+              "ATIVO",
+              "SUSPENSO",
+              "CANCELADO"
+            ]
+          },
+          "situacaoTexto": {
+            "type": "string"
+          },
+          "novaVistoria": {
+            "type": "boolean",
+            "description": "Suspenso que precisa de nova vistoria para voltar"
+          },
+          "ativacao": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "etapa": {
+                  "type": "string"
+                },
+                "feita": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "description": "Etapas que faltam (só aguardando ativação)"
+          },
+          "protecaoDesde": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "socorroMutuo": {
+                "type": "string",
+                "format": "date"
+              },
+              "assistencia24h": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "guinchoKm": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "beneficios": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "participacao": {
+            "type": "object",
+            "properties": {
+              "percentual": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "minimo": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "valor": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            }
+          },
+          "carteirinha": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Carteirinha"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Carteirinha": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "matricula": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "documento": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "***.982.247-**"
+          },
+          "placa": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "veiculo": {
+            "type": "string"
+          },
+          "plano": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "emitidaEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Quando a situação foi conferida"
+          }
+        }
+      },
+      "Cobranca": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "integer"
+          },
+          "descricao": {
+            "type": "string"
+          },
+          "vencimento": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "valorHoje": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Com multa, juros ou desconto do dia"
+          },
+          "diasAtraso": {
+            "type": "integer"
+          },
+          "pix": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "copiaECola": {
+                "type": "string"
+              },
+              "qrCode": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Imagem (data URL) quando houver"
+              },
+              "valor": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "validoAte": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            }
+          },
+          "boleto": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "linhaDigitavel": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "vencimento": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "pdf": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Caminho na API (cobrança própria)"
+              }
+            }
+          }
+        }
+      },
+      "Documento": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "CNH",
+              "CRLV",
+              "COMPROVANTE_RESIDENCIA",
+              "FOTO_VEICULO",
+              "BOLETIM_OCORRENCIA",
+              "OUTRO"
+            ]
+          },
+          "tipoTexto": {
+            "type": "string"
+          },
+          "arquivo": {
+            "type": "string"
+          },
+          "tamanho": {
+            "type": "integer"
+          },
+          "situacao": {
+            "type": "string",
+            "enum": [
+              "RECEBIDO",
+              "CONFERIDO",
+              "RECUSADO"
+            ]
+          },
+          "situacaoTexto": {
+            "type": "string"
+          },
+          "motivoRecusa": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "placa": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "enviadoEm": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Evento": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "string",
+            "example": "EV-0007"
+          },
+          "tipo": {
+            "type": "string",
+            "example": "Colisão"
+          },
+          "situacao": {
+            "type": "string"
+          },
+          "situacaoTexto": {
+            "type": "string"
+          },
+          "orientacao": {
+            "type": "string"
+          },
+          "placa": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ocorridoEm": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "abertoEm": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AbrirEvento": {
+        "type": "object",
+        "properties": {
+          "whatsapp": {
+            "type": "string",
+            "description": "Link wa.me da Central 24 h com a mensagem pronta (nome e placa)"
+          },
+          "whatsappNumero": {
+            "type": "string"
+          },
+          "telefone0800": {
+            "type": "string"
+          },
+          "relato": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Link para mandar fotos e vídeo do ocorrido"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "sessao": []
+    }
+  ],
+  "paths": {
+    "/entrar": {
+      "post": {
+        "summary": "Pedir o código de acesso",
+        "description": "Manda um código de 6 números para o WhatsApp do cadastro. A resposta é a mesma para CPF de associado ou não (privacidade). Um código por minuto, 5 por hora.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cpf"
+                ],
+                "properties": {
+                  "cpf": {
+                    "type": "string",
+                    "example": "529.982.247-25"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pedido aceito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "desafio": {
+                      "type": "string"
+                    },
+                    "mensagem": {
+                      "type": "string"
+                    },
+                    "expiraEm": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "CPF inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Pedidos demais",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Acesso pelo aplicativo ainda não ligado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/entrar/confirmar": {
+      "post": {
+        "summary": "Confirmar o código e abrir a sessão",
+        "description": "5 códigos errados invalidam o desafio. A sessão vale 180 dias; guarde o token no Keychain/Keystore.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "desafio",
+                  "codigo"
+                ],
+                "properties": {
+                  "desafio": {
+                    "type": "string"
+                  },
+                  "codigo": {
+                    "type": "string",
+                    "example": "123456"
+                  },
+                  "plataforma": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android"
+                    ]
+                  },
+                  "dispositivo": {
+                    "type": "string",
+                    "example": "iPhone 15"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sessão aberta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "expiraEm": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "associado": {
+                      "type": "object",
+                      "properties": {
+                        "nome": {
+                          "type": "string"
+                        },
+                        "primeiroNome": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Código errado, vencido ou já usado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/entrar/senha": {
+      "post": {
+        "summary": "Entrar com CPF e senha",
+        "description": "A mesma senha da área do associado (/associado/entrar). Quem ainda não tem senha cria em /associado/acesso (abra no navegador). 5 erros travam 15 minutos.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cpf",
+                  "senha"
+                ],
+                "properties": {
+                  "cpf": {
+                    "type": "string",
+                    "example": "529.982.247-25"
+                  },
+                  "senha": {
+                    "type": "string"
+                  },
+                  "plataforma": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android"
+                    ]
+                  },
+                  "dispositivo": {
+                    "type": "string",
+                    "example": "iPhone 15"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sessão aberta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "expiraEm": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "associado": {
+                      "type": "object",
+                      "properties": {
+                        "nome": {
+                          "type": "string"
+                        },
+                        "primeiroNome": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "CPF ou senha não conferem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Tentativas demais",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sair": {
+      "post": {
+        "summary": "Encerrar a sessão deste aparelho",
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dispositivo": {
+      "put": {
+        "summary": "Guardar o token de notificação (FCM/APNs)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "pushToken"
+                ],
+                "properties": {
+                  "pushToken": {
+                    "type": "string"
+                  },
+                  "plataforma": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resumo": {
+      "get": {
+        "summary": "Tela inicial (tudo de uma vez)",
+        "responses": {
+          "200": {
+            "description": "Resumo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "associado": {
+                      "type": "object",
+                      "properties": {
+                        "nome": {
+                          "type": "string"
+                        },
+                        "primeiroNome": {
+                          "type": "string"
+                        },
+                        "documento": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "matricula": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "situacao": {
+                          "type": "string"
+                        },
+                        "desde": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "associacao": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "veiculos": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Veiculo"
+                      }
+                    },
+                    "cobranca": {
+                      "type": "object",
+                      "description": "Resumo; detalhes em GET /cobrancas"
+                    },
+                    "eventos": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Evento"
+                      }
+                    },
+                    "contratos": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "documentos": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Documento"
+                      }
+                    },
+                    "abrirEvento": {
+                      "$ref": "#/components/schemas/AbrirEvento"
+                    },
+                    "aplicativos": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Links das lojas; null até o aplicativo estar publicado",
+                      "properties": {
+                        "ios": {
+                          "type": "string"
+                        },
+                        "android": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/carteirinha": {
+      "get": {
+        "summary": "Carteirinhas digitais (proteção ativa)",
+        "description": "Guarde a última resposta no aparelho para mostrar sem internet, com a data de emitidaEm.",
+        "responses": {
+          "200": {
+            "description": "Carteirinhas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "carteirinhas": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Carteirinha"
+                      }
+                    },
+                    "assistencia24h": {
+                      "type": "object",
+                      "properties": {
+                        "telefone0800": {
+                          "type": "string"
+                        },
+                        "whatsapp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cobrancas": {
+      "get": {
+        "summary": "2ª via: Pix, linha digitável e PDF do boleto",
+        "responses": {
+          "200": {
+            "description": "Cobranças",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "origem": {
+                      "type": "string",
+                      "enum": [
+                        "PROPRIA",
+                        "SIPROV"
+                      ]
+                    },
+                    "aviso": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Cobrado pelo SIPROV: aviso de que a 2ª via é pelo próprio SIPROV"
+                    },
+                    "linkPagamento": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Página de pagamento (inclui cartão)"
+                    },
+                    "emAberto": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Cobranca"
+                      }
+                    },
+                    "pagas": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "cartao": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "bandeira": {
+                          "type": "string"
+                        },
+                        "final": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cobrancas/{id}/boleto": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "summary": "PDF do boleto (cobrança própria em aberto)",
+        "responses": {
+          "200": {
+            "description": "PDF",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "PDF ainda não pronto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/eventos": {
+      "get": {
+        "summary": "Eventos e como abrir um novo",
+        "responses": {
+          "200": {
+            "description": "Eventos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "eventos": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Evento"
+                      }
+                    },
+                    "abrirEvento": {
+                      "$ref": "#/components/schemas/AbrirEvento"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contratos": {
+      "get": {
+        "summary": "Contratos assinados e regulamento",
+        "responses": {
+          "200": {
+            "description": "Contratos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contratos": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "codigo": {
+                            "type": "string"
+                          },
+                          "assinadoEm": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "placa": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "termo": {
+                            "type": "string"
+                          },
+                          "proposta": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "regulamento": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contratos/{id}/{tipo}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "tipo",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "termo",
+              "proposta"
+            ]
+          }
+        }
+      ],
+      "get": {
+        "summary": "PDF do termo de adesão ou da proposta de filiação",
+        "responses": {
+          "200": {
+            "description": "PDF",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regulamento": {
+      "get": {
+        "summary": "PDF do regulamento",
+        "responses": {
+          "200": {
+            "description": "PDF",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documentos": {
+      "get": {
+        "summary": "Documentos mandados e a situação de cada um",
+        "responses": {
+          "200": {
+            "description": "Documentos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "documentos": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Documento"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Mandar um documento",
+        "description": "Foto (JPEG, PNG, WebP, HEIC) ou PDF até 4 MB; reduza a foto no aparelho (lado maior até 2000 px). O tipo é conferido pelo conteúdo do arquivo. 20 envios por dia.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tipo",
+                  "arquivo"
+                ],
+                "properties": {
+                  "tipo": {
+                    "type": "string",
+                    "enum": [
+                      "CNH",
+                      "CRLV",
+                      "COMPROVANTE_RESIDENCIA",
+                      "FOTO_VEICULO",
+                      "BOLETIM_OCORRENCIA",
+                      "OUTRO"
+                    ]
+                  },
+                  "arquivo": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "veiculoId": {
+                    "type": "string"
+                  },
+                  "observacao": {
+                    "type": "string",
+                    "maxLength": 300
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Recebido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Documento"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Limite do dia ou envio desligado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documentos/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Arquivo de um documento mandado",
+        "responses": {
+          "200": {
+            "description": "Arquivo",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sessão inválida ou vencida: entrar de novo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
